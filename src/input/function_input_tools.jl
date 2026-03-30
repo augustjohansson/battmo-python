@@ -1,4 +1,4 @@
-export polyfit, update_json_input, compute_ocp_from_string
+export polyfit, update_json_input, compute_ocp_from_string, make_invokable
 
 using JSON
 using Polynomials
@@ -188,3 +188,14 @@ function setup_conductivity_evaluation_expression_from_string(str)
     
 end
 
+"""
+    make_invokable(func)
+
+Wrap `func` so it can be called uniformly from Julia. For plain Julia callables this
+returns a thin wrapper using `Base.invokelatest`. When PythonCall is loaded the
+BattMoPythonCallExt extension adds an additional method that handles `PythonCall.Py`
+objects by converting the return value to a Julia `Real`.
+"""
+function make_invokable(func)
+    return (args...) -> Base.invokelatest(func, args...)
+end
